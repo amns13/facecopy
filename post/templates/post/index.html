@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <form id='form' method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Post">
+    </form>
+    <hr>
+    {% for post in posts %}
+        <p>{{ post.content }}</p>
+        <hr>
+    {% endfor %}
+
+    <!-- <ul>
+        {% for post in object_list %}
+            <li>{{ post.content }}</li>
+        {% endfor %}
+    </ul> -->
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        $('#form').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "{% url 'post_status_update' %}",
+                data: {
+                    content: $('#id_content').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    dataType: "json",
+                },
+
+                success: function(data) {
+                    $('#id_content').val('');
+                    alert(data.message);
+                },
+
+                failure: function(data) {
+                    $('#id_content').val('');
+                    alert(data.message)
+                }
+            })
+        });
+    </script>
+{% endblock %}
